@@ -15,7 +15,7 @@ if(!cached) {
   cached = global.mongoose = { conn: null, promise: null };
 }
 
-export async function connectToDatabase() {
+const connectToDatabase = async function() {
  
     const maxPoolSize= 10;
 

@@ -63,7 +63,6 @@ Using tsconfig.json file
 -----
 # CREATE SCHEMA & MODEL IN TypeScript + Next.js
 
-
 ### Steps
 
 1. **Define a TypeScript interface `IUser` to represent a User document structure:**
@@ -94,3 +93,18 @@ Using tsconfig.json file
 5. **Export the `User` model to be used elsewhere in the application (e.g., API routes).**
 
 -----
+
+# WRITING CONTROLLERS
+
+## Q. Where to write controllers?
+### Exactly within:
+```bash
+/app/api
+```
+
+Everything as a folder structure we define within '/app/api' is treated as a route and file must be named 'route.ts'
+
+### Example below is a register route:
+```bash
+app/api/auth/register/route.ts
+```
