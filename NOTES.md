@@ -24,7 +24,7 @@ In order to address this issue we have:
 global {} - an object know overall the project to keep chached info
 ```
 
-```typescript
+```ts
 import { Connection } from "mongoose";
 
 declare global {
@@ -73,11 +73,11 @@ Using tsconfig.json file
 
 ---
 
-# CREATE SCHEMA & MODEL IN TypeScript + Next.js
+# CREATE SCHEMA & MODEL IN ts + Next.js
 
 ### Steps
 
-1. **Define a TypeScript interface `IUser` to represent a User document structure:**
+1. **Define a ts interface `IUser` to represent a User document structure:**
 
    - Fields:
      - `_id`: ObjectId
@@ -138,7 +138,7 @@ app/api/auth/register/route.ts
 if using ts -> setup '@/next-auth.d.ts'
 ```
 
-```typescript
+```ts
 import { DefaultSession } from "next-auth";
 
 declare module "next-auth" {
@@ -152,7 +152,7 @@ declare module "next-auth" {
 }
 ```
 
-```typescript
+```ts
 NextAuthOptions
 ├── providers
 │   └── CredentialsProvider
@@ -179,4 +179,67 @@ NextAuthOptions
 │   └── maxAge: 2592000 (30 * 24 * 60 * 60 seconds)
 └── secret: process.env.NEXTAUTH_SECRET
 
+```
+
+### @/app/api/auth/[...nextauth]/route.ts
+```ts
+import { AuthOptions } from "@/lib/nextAuthOptions";
+import NextAuth from "next-auth";
+
+const handler = NextAuth(AuthOptions);
+
+export { handler as GET, handler as POST };
+```
+
+### Middleware (withAuth)
+```bash
+'@/middleware.ts'
+```
+```ts
+import withAuth from "next-auth/middleware";
+import { NextResponse } from "next/server";
+
+export default withAuth(
+    function middleware(){
+        return NextResponse.next();
+    },
+    {
+        callbacks: {
+            // allow authorized requests only to pass the middleware else return false
+            authorized: ({ token,req }) => {
+                const {pathname} = req.nextUrl;
+
+                if(
+                    pathname.startsWith('/api/auth') ||
+                    pathname === '/login' ||
+                    pathname === '/register' 
+                ){
+                    return true;
+                }
+
+                if(
+                    pathname === '/' ||
+                    pathname.startsWith("/api/videos") 
+                ){
+                    return true;
+                }
+
+                return !!token;
+            },
+        }
+    }
+)
+
+export const config = {
+    matcher: [
+        /*
+         * Match all request paths except for the ones starting with:
+         * - api (API routes)
+         * - _next/static (static files)
+         * - _next/image (image optimization files)
+         * - favicon.ico (favicon file)
+         */
+        '/((?!api|_next/static|_next/image|favicon.ico).*)',
+    ],
+}
 ```
