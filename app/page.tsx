@@ -1,15 +1,30 @@
 "use client";
-import ImageKitProviderWrapper from "@/app/components/ImageKitProviderWrapper";
-import Uploader from "@/app/components/Uploader";
+
+import { apiClient } from "@/lib/api-client";
+import { IVideo } from "@/models/video.model";
+import { useEffect, useState } from "react";
+import VideoFeed from "./components/VideoFeed";
 
 export default function Home() {
+  const [videos, setVideos] = useState<IVideo[]>([]);
+
+  useEffect(() => {
+    const fetchVideos = async () => {
+      try {
+        const data = await apiClient.getVideos();
+        setVideos(data);
+      } catch (error) {
+        console.error("Error fetching videos:", error);
+      }
+    };
+
+    fetchVideos();
+  }, []);
+
   return (
-    <div className="font-sans grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <ImageKitProviderWrapper>
-          <Uploader />
-        </ImageKitProviderWrapper>
-      </main>
-    </div>
+    <main className="container mx-auto px-4 py-8">
+      <h1 className="text-3xl font-bold mb-8">ImageKit ReelsPro</h1>
+      <VideoFeed videos={videos} />
+    </main>
   );
 }
